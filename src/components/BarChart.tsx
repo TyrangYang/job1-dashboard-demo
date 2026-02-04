@@ -2,13 +2,21 @@ import React, { FC } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { ChartData, ChartOptions } from 'chart.js';
 import type { NormalizedDataType } from '../normalizedData';
+import { useDataContext } from '../context/DataProvider';
 
 interface Props {
   data: NormalizedDataType[];
 }
 const BarChart: FC<Props> = ({ data }) => {
+  const { allAvailableDimension } = useDataContext();
+
   const barData: ChartData<'bar'> = {
-    labels: data.map((e) => e.key),
+    labels: data.map((d) => {
+      return allAvailableDimension.reduce((res, dim) => {
+        if (res === '') return d[dim] as string;
+        return res + ' / ' + d[dim];
+      }, '');
+    }),
     datasets: [
       {
         label: 'Pending vs key',

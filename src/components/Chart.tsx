@@ -31,7 +31,7 @@ const Chart: FC<Props> = ({ data }) => {
       tooltip: {
         callbacks: {
           label: (context) => {
-            const dataPoint = data[context.parsed.x];
+            const dataPoint = data[context.parsed.x ?? 0];
             return `${dataPoint.key}: ${context.parsed.y}`;
           },
         },
@@ -51,10 +51,9 @@ const Chart: FC<Props> = ({ data }) => {
           callback: function (value) {
             if (typeof value === 'string') return '';
             const item = data[value];
-            console.log(item);
             if (item === undefined) return '';
             const label = allAvailableDimension.reduce((res, dim) => {
-              if (res === '') return item[dim];
+              if (res === '') return item[dim] as string;
               return res + ' / ' + item[dim];
             }, '');
             return label;

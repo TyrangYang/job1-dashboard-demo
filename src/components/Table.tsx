@@ -10,7 +10,7 @@ interface Props {
 
 const Table: FC<Props> = ({ data }) => {
   const { allAvailableDimension } = useDataContext();
-  console.log({ allAvailableDimension });
+  // console.log({ allAvailableDimension });
   const columnDefs = useMemo<ColDef[]>(() => {
     if (data.length === 0) return [];
     return Object.keys(data[0]).map((f) => {

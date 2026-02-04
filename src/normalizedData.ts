@@ -10,7 +10,7 @@ const SEPARATOR = '|||||';
 
 export const normalizedData = (
   data: DataType[],
-  selectedFilterOptions: Record<string, string[]>
+  selectedFilterOptions: Record<string, string[]>,
 ) => {
   const validFilterField = Object.entries(selectedFilterOptions).reduce<
     string[]
@@ -22,7 +22,7 @@ export const normalizedData = (
 
   const filterData = data.filter((eachData) => {
     return validFilterField.every((field) =>
-      selectedFilterOptions[field].includes(eachData[field as keyof DataType])
+      selectedFilterOptions[field].includes(eachData[field as keyof DataType]),
     );
   });
 
@@ -34,9 +34,9 @@ export const normalizedData = (
   };
 
   const groupedData = Object.groupBy(filterData, (each: DataType) =>
-    genKeyField(each)
+    genKeyField(each),
   );
-  console.log({ groupedData });
+  // console.log({ groupedData });
 
   // aggregate/calculate placed cancelled inducted pending number
   const accumulateData = Object.entries(groupedData).map<NormalizedDataType>(
@@ -68,7 +68,7 @@ export const normalizedData = (
         {
           cancelled: 0,
           inducted: 0,
-        }
+        },
       );
       return {
         ...dimCol,
@@ -76,9 +76,9 @@ export const normalizedData = (
         ...calValList,
         pending: valList.length - calValList.cancelled - calValList.inducted,
       };
-    }
+    },
   );
 
-  console.log({ normalized: accumulateData });
+  // console.log({ normalized: accumulateData });
   return accumulateData;
 };
