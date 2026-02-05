@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import Filter from './Filter';
 import { useDataContext } from '../context/DataProvider';
+import CustomFilter from './Filters/CustomFilter';
 
 interface Props {}
 const FilterList: FC<Props> = () => {
@@ -11,7 +12,7 @@ const FilterList: FC<Props> = () => {
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        flexWrap: 'wrap',
+        flexWrap: 'nowrap',
       }}
     >
       {Object.entries(filterOptions).map(([filterName, values]) => {
@@ -23,8 +24,8 @@ const FilterList: FC<Props> = () => {
               width: '400px',
             }}
           >
-            <Filter filterKey={filterName} options={options} />
-            <label>{filterName}</label>
+            {/* <Filter filterKey={filterName} options={options} /> */}
+            <CustomFilter filterKey={filterName} options={options} />
           </div>
         );
       })}

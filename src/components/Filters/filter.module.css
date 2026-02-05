@@ -1,0 +1,31 @@
+.filterLabel {
+  font-weight: bold;
+}
+.filterBoard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+}
+.filterButton {
+  /* width: 200px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  text-wrap: balance; */
+}
+.pop {
+  border: 1px solid #f00;
+  width: 200px;
+}
+.filterButton.active {
+  background-color: aqua;
+}
+
+button {
+  all: unset;
+  width: 200px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  text-wrap: balance;
+}
