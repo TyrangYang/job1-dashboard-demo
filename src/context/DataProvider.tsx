@@ -54,7 +54,7 @@ const DataProvider: FC<Props> = ({ children }) => {
 
   const allAvailableDimension = useMemo<string[]>(() => {
     return Object.keys(selectedFilterOptions).filter(
-      (key) => selectedFilterOptions[key].length !== 0
+      (key) => selectedFilterOptions[key].length !== 0,
     );
   }, [selectedFilterOptions]);
 
@@ -63,6 +63,7 @@ const DataProvider: FC<Props> = ({ children }) => {
       const fetchedData = await fetchData();
       const { fields: allPossibleFilterOptions } =
         normalizedOption(fetchedData);
+      // console.log(allPossibleFilterOptions);
       // setAllDimension(dimensions);
       setFilterOptions(allPossibleFilterOptions);
       setData(fetchedData);

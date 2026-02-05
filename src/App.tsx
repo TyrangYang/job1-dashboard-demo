@@ -26,7 +26,7 @@ ChartJS.register(
   BarElement,
   CategoryScale,
   Tooltip,
-  Legend
+  Legend,
 );
 
 function App() {

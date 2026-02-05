@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import Filter from './Filter';
+// import Filter from './Filter';
 import { useDataContext } from '../context/DataProvider';
 import CustomFilter from './Filters/CustomFilter';
 

@@ -39,7 +39,7 @@ type NeededFieldsKeys = (typeof NeededFields)[number];
 export type DataType = Pick<RawDataType, NeededFieldsKeys>;
 
 export const fetchData = async () => {
-  const response = await fetch('/result-16.csv');
+  const response = await fetch(process.env.PUBLIC_URL + '/result-16.csv');
   const csvText = await response.text();
   const parsedObj = papa.parse<RawDataType>(csvText, {
     header: true,
