@@ -1,4 +1,5 @@
 import papa from 'papaparse';
+import { filteringData } from './normalizedData';
 export type RawDataType = {
   COMMIT_CD: string;
   EVENT_ID: string;
@@ -40,6 +41,7 @@ export type DataType = Pick<RawDataType, NeededFieldsKeys>;
 
 export const fetchData = async () => {
   const response = await fetch(process.env.PUBLIC_URL + '/result-16.csv');
+  console.log(process.env.PUBLIC_URL);
   const csvText = await response.text();
   const parsedObj = papa.parse<RawDataType>(csvText, {
     header: true,
@@ -54,4 +56,18 @@ export const fetchData = async () => {
   console.log({ fetched: res });
 
   return res;
+};
+
+export const fetchFilterOptions = async (payload: {
+  target: NeededFieldsKeys;
+  filters: Record<string, string[]>;
+}) => {
+  const data = await fetchData();
+  const { filters, target } = payload;
+
+  const filteredData = filteringData(data, filters);
+
+  const options = filteredData.map((data) => data[target]);
+
+  return [...new Set(options)];
 };

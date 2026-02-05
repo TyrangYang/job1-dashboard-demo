@@ -9,6 +9,25 @@ export type NormalizedDataType = {
 
 const SEPARATOR = '|||||';
 
+export const filteringData = (
+  data: DataType[],
+  selectedFilterOptions: Record<string, string[]>,
+) => {
+  const validFilterField = Object.entries(selectedFilterOptions).reduce<
+    string[]
+  >((res, cur) => {
+    const [k, v] = cur;
+    if (v.length !== 0) res.push(k);
+    return res;
+  }, []);
+  const filterData = data.filter((eachData) => {
+    return validFilterField.every((field) =>
+      selectedFilterOptions[field].includes(eachData[field as keyof DataType]),
+    );
+  });
+  return filterData;
+};
+
 export const normalizedData = (
   data: DataType[],
   selectedFilterOptions: Record<string, string[]>,
@@ -37,7 +56,7 @@ export const normalizedData = (
   const groupedData = groupBy(filterData, (each: DataType) =>
     genKeyField(each),
   );
-  // console.log({ groupedData });
+  console.log({ groupedData });
 
   // aggregate/calculate placed cancelled inducted pending number
   const accumulateData = Object.entries(groupedData).map<NormalizedDataType>(

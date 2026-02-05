@@ -9,16 +9,19 @@ export const normalizedOption = (data: DataType[]) => {
       });
       return res;
     },
-    OptionsFields.reduce((prev, cur_f) => {
-      return {
-        ...prev,
-        [cur_f]: new Set(),
-      };
-    }, {} as { [key in OptionsFieldsType]: Set<string> })
+    OptionsFields.reduce(
+      (prev, cur_f) => {
+        return {
+          ...prev,
+          [cur_f]: new Set(),
+        };
+      },
+      {} as { [key in OptionsFieldsType]: Set<string> },
+    ),
   );
 
   const fields = Object.fromEntries(
-    Object.entries(fieldsWithDup).map(([k, v]) => [k, [...v]]) // remove duplication
+    Object.entries(fieldsWithDup).map(([k, v]) => [k, [...v]]), // remove duplication
   );
 
   const dimensions = Object.keys(fields);
