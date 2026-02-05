@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import FilterProvider, {
   OptionsBasic,
   useFilterContext,
@@ -7,7 +7,7 @@ import FilterProvider, {
 import styles from './filter.module.css';
 import Select from 'antd/es/select';
 
-const maxOnScreen = 6;
+const maxOnScreen = 5;
 
 interface Props {
   filterKey: string;
@@ -15,50 +15,58 @@ interface Props {
 }
 
 const CustomFilter: FC<Props> = ({ filterKey, options }) => {
-  console.log(filterKey, options);
-
-  const optionsAsBtn = options.slice(0, maxOnScreen);
-  const optionsInDropDown = options.slice(maxOnScreen);
+  // console.log(filterKey, options);
 
   return (
     <FilterProvider filterKey={filterKey} options={options}>
       <label className={styles.filterLabel}>{filterKey}</label>
-      <div className={styles.filterBoard}>
-        {optionsAsBtn.map((eachOption) => {
-          return (
-            <FilterItemButton
-              label={eachOption.label}
-              value={eachOption.value}
-            />
-          );
-        })}
-        {optionsInDropDown.length !== 0 && (
-          <SelectMore options={optionsInDropDown} />
-        )}
-      </div>
+      <FilterBoard />
     </FilterProvider>
+  );
+};
+
+const FilterBoard: FC = () => {
+  const { options } = useFilterContext();
+  const optionsAsBtn = options.slice(0, maxOnScreen);
+  const optionsInDropDown = options.slice(maxOnScreen);
+  return (
+    <div className={styles.filterBoard}>
+      <ALLButton />
+      {optionsAsBtn.map((eachOption) => {
+        return (
+          <FilterItemButton
+            label={eachOption.label}
+            value={eachOption.value}
+            selected={eachOption.isSelected}
+          />
+        );
+      })}
+      {optionsInDropDown.length !== 0 && (
+        <SelectMore options={optionsInDropDown} />
+      )}
+    </div>
   );
 };
 
 interface ItemsProps {
   label: string;
   value: string;
+  selected: boolean;
 }
 
-export const FilterItemButton: FC<ItemsProps> = ({ label, value }) => {
-  const [selected, setSelected] = useState(false);
-  const { addSelectedValue, removeSelectedValue } = useFilterContext();
+export const FilterItemButton: FC<ItemsProps> = ({
+  label,
+  value,
+  selected,
+}) => {
+  const { dispatchOptionSelectedStatus } = useFilterContext();
 
   const handleOnClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     // console.log(e.metaKey);
-    if (selected) {
-      removeSelectedValue(value);
-    } else {
-      addSelectedValue(value);
-    }
-    setSelected((prev) => !prev);
+    // console.log(value);
+    dispatchOptionSelectedStatus({ type: 'toggle', optionKey: value });
   };
   return (
     <button
@@ -71,13 +79,14 @@ export const FilterItemButton: FC<ItemsProps> = ({ label, value }) => {
 };
 
 const ALLButton: FC = () => {
-  const [selected, setSelected] = useState(false);
+  const { isAllSelected, dispatchOptionSelectedStatus } = useFilterContext();
   const handleOnClick = () => {
-    setSelected((prev) => !prev);
+    if (isAllSelected) dispatchOptionSelectedStatus({ type: 'cleanAll' });
+    else dispatchOptionSelectedStatus({ type: 'selectAll' });
   };
   return (
     <button
-      className={`${styles.filterButton} ${selected ? styles.active : ''}`}
+      className={`${styles.filterButton} ${isAllSelected ? styles.active : ''}`}
       onClick={handleOnClick}
     >
       ALL
@@ -89,11 +98,14 @@ interface SelectMoreProps {
   options: {
     label: string;
     value: string;
+    isSelected: boolean;
   }[];
 }
 export const SelectMore: FC<SelectMoreProps> = ({ options }) => {
-  const [values, setValues] = useState<string[]>([]);
-  const { addSelectedValue, removeSelectedValue } = useFilterContext();
+  const { dispatchOptionSelectedStatus } = useFilterContext();
+  const toggle = (value: string) => {
+    dispatchOptionSelectedStatus({ type: 'toggle', optionKey: value });
+  };
   return (
     <Select
       mode="multiple"
@@ -109,12 +121,9 @@ export const SelectMore: FC<SelectMoreProps> = ({ options }) => {
       }}
       style={{ width: '100%' }}
       placeholder={'more +' + options.length}
-      value={values}
-      onChange={(values: string[]) => {
-        setValues(values);
-      }}
-      onSelect={addSelectedValue}
-      onDeselect={removeSelectedValue}
+      value={options.filter((e) => e.isSelected).map((e) => e.value)}
+      onSelect={toggle}
+      onDeselect={toggle}
       options={options}
     />
   );

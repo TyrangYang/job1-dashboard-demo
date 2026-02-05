@@ -12,7 +12,8 @@ const FilterList: FC<Props> = () => {
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        flexWrap: 'nowrap',
+        // width: '100vw',
+        // flexWrap: 'nowrap',
       }}
     >
       {Object.entries(filterOptions).map(([filterName, values]) => {
