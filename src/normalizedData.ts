@@ -1,4 +1,5 @@
 import { DataType } from './fetchData';
+import { groupBy } from 'lodash';
 export type NormalizedDataType = {
   placed: number;
   cancelled: number;
@@ -33,7 +34,7 @@ export const normalizedData = (
     }, '');
   };
 
-  const groupedData = Object.groupBy(filterData, (each: DataType) =>
+  const groupedData = groupBy(filterData, (each: DataType) =>
     genKeyField(each),
   );
   // console.log({ groupedData });
