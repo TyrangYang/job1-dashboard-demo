@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # ⚠ 给 github-actions[bot] 推送权限
+
 
     steps:
       # 1. 检出代码
