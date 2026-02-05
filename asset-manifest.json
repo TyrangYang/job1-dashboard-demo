@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/job1-dashboard-demo/static/css/main.dd5abd89.css",
+    "main.js": "/job1-dashboard-demo/static/js/main.e020238d.js",
+    "static/js/453.f2d652d2.chunk.js": "/job1-dashboard-demo/static/js/453.f2d652d2.chunk.js",
+    "index.html": "/job1-dashboard-demo/index.html",
+    "main.dd5abd89.css.map": "/job1-dashboard-demo/static/css/main.dd5abd89.css.map",
+    "main.e020238d.js.map": "/job1-dashboard-demo/static/js/main.e020238d.js.map",
+    "453.f2d652d2.chunk.js.map": "/job1-dashboard-demo/static/js/453.f2d652d2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dd5abd89.css",
+    "static/js/main.e020238d.js"
+  ]
+}
