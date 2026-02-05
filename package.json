@@ -2,7 +2,7 @@
   "name": "dashboard-demo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/TyrangYang/job1-dashboard-demo",
+  "homepage": "https://tyrangyang.github.io/job1-dashboard-demo",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
