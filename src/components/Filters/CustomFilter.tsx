@@ -11,14 +11,13 @@ const maxOnScreen = 5;
 
 interface Props {
   filterKey: string;
-  options: OptionsBasic[];
 }
 
-const CustomFilter: FC<Props> = ({ filterKey, options }) => {
+const CustomFilter: FC<Props> = ({ filterKey }) => {
   // console.log(filterKey, options);
 
   return (
-    <FilterProvider filterKey={filterKey} options={options}>
+    <FilterProvider filterKey={filterKey}>
       <label className={styles.filterLabel}>{filterKey}</label>
       <FilterBoard />
     </FilterProvider>
@@ -26,15 +25,19 @@ const CustomFilter: FC<Props> = ({ filterKey, options }) => {
 };
 
 const FilterBoard: FC = () => {
-  const { options } = useFilterContext();
+  const { loading, options, filterKey } = useFilterContext();
   const optionsAsBtn = options.slice(0, maxOnScreen);
   const optionsInDropDown = options.slice(maxOnScreen);
+  if (loading) {
+    return <div>loading</div>;
+  }
   return (
     <div className={styles.filterBoard}>
       <ALLButton />
       {optionsAsBtn.map((eachOption) => {
         return (
           <FilterItemButton
+            key={`filter-${filterKey}-item-button-${eachOption.value}`}
             label={eachOption.label}
             value={eachOption.value}
             selected={eachOption.isSelected}

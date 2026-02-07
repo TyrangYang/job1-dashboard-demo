@@ -4,9 +4,11 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
 } from 'react';
 import type { FC, PropsWithChildren, ActionDispatch } from 'react';
 import { useDataContext } from '../../context/DataProvider';
+import { fetchFilterOptions } from '../../fetchData';
 
 export interface OptionsBasic {
   label: string;
@@ -14,6 +16,7 @@ export interface OptionsBasic {
 }
 
 interface ContextType {
+  loading: boolean;
   filterKey: string;
   selectedValue: string[];
   isAllSelected: boolean;
@@ -24,42 +27,64 @@ const FilterContext = createContext<ContextType | undefined>(undefined);
 
 interface Props extends PropsWithChildren {
   filterKey: string;
-  options: OptionsBasic[];
 }
 
 type ActionType =
   | { type: 'toggle'; optionKey: string }
+  | { type: 'init'; options: OptionsBasic[] }
   | { type: 'cleanAll' }
   | { type: 'selectAll' };
 
-const FilterProvider: FC<Props> = ({ filterKey, options, children }) => {
+const FilterProvider: FC<Props> = ({ filterKey, children }) => {
   // this design is just for mimic mobx. Not necessary
 
   const { setSelectedFilterOptions } = useDataContext();
+  const [loading, setLoading] = useState(true);
 
   // reduce mimic @action. status(allOptions) mimic @observable
   const [allOptions, dispatchOptionSelectedStatus] = useReducer<
     (OptionsBasic & { isSelected: boolean })[],
     [ActionType]
-  >(
-    (prevOptions, action) => {
-      if (action.type === 'toggle') {
-        const target = prevOptions.find(
-          (option) => option.value === action.optionKey,
+  >((prevOptions, action) => {
+    switch (action.type) {
+      case 'toggle':
+        return prevOptions.map((option) =>
+          option.value === action.optionKey
+            ? { ...option, isSelected: !option.isSelected }
+            : option,
         );
-        if (target) {
-          target.isSelected = !target.isSelected;
-        }
-        console.log({ prevOptions });
-        return [...prevOptions];
-      } else if (action.type === 'selectAll') {
+      case 'selectAll':
         return prevOptions.map((option) => ({ ...option, isSelected: true }));
-      } else {
-        return prevOptions.map((option) => ({ ...option, isSelected: false }));
-      }
-    },
-    options.map((e) => ({ ...e, isSelected: false })),
-  );
+      case 'cleanAll':
+        return prevOptions.map((option) => ({
+          ...option,
+          isSelected: false,
+        }));
+      case 'init':
+        console.log(action.options);
+        return action.options.map((e) => ({ ...e, isSelected: false }));
+
+      default:
+        return prevOptions;
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      const options = await fetchFilterOptions({
+        target: filterKey,
+        filters: {},
+      });
+
+      dispatchOptionSelectedStatus({
+        type: 'init',
+        options: options.map((e) => ({ label: e, value: e })),
+      });
+      setLoading(false);
+    };
+    fetch();
+  }, []);
 
   const isAllSelected = useMemo(() => {
     return allOptions.every((e) => e.isSelected);
@@ -77,6 +102,7 @@ const FilterProvider: FC<Props> = ({ filterKey, options, children }) => {
   return (
     <FilterContext.Provider
       value={{
+        loading,
         filterKey,
         selectedValue,
         isAllSelected,

@@ -59,7 +59,7 @@ export const fetchData = async () => {
 };
 
 export const fetchFilterOptions = async (payload: {
-  target: NeededFieldsKeys;
+  target: string;
   filters: Record<string, string[]>;
 }) => {
   const data = await fetchData();
@@ -67,7 +67,7 @@ export const fetchFilterOptions = async (payload: {
 
   const filteredData = filteringData(data, filters);
 
-  const options = filteredData.map((data) => data[target]);
+  const options = filteredData.map((data) => data[target as NeededFieldsKeys]);
 
   return [...new Set(options)];
 };

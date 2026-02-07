@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 // import Filter from './Filter';
-import { useDataContext } from '../context/DataProvider';
 import CustomFilter from './Filters/CustomFilter';
+import { useMetaData } from '../context/MetaDataProvider';
 
 interface Props {}
 const FilterList: FC<Props> = () => {
-  const { filterOptions } = useDataContext();
+  const { dimensions } = useMetaData();
 
   return (
     <div
@@ -16,8 +16,7 @@ const FilterList: FC<Props> = () => {
         // flexWrap: 'nowrap',
       }}
     >
-      {Object.entries(filterOptions).map(([filterName, values]) => {
-        const options = values.map((item) => ({ label: item, value: item }));
+      {dimensions.map((filterName) => {
         return (
           <div
             key={`filter-${filterName}`}
@@ -25,8 +24,7 @@ const FilterList: FC<Props> = () => {
               width: '400px',
             }}
           >
-            {/* <Filter filterKey={filterName} options={options} /> */}
-            <CustomFilter filterKey={filterName} options={options} />
+            <CustomFilter filterKey={filterName} />
           </div>
         );
       })}
