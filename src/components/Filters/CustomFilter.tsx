@@ -1,8 +1,5 @@
 import React, { FC } from 'react';
-import FilterProvider, {
-  OptionsBasic,
-  useFilterContext,
-} from './FilterProvider';
+import FilterProvider, { useFilterContext } from './FilterProvider';
 
 import styles from './filter.module.css';
 import Select from 'antd/es/select';

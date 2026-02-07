@@ -84,7 +84,7 @@ const FilterProvider: FC<Props> = ({ filterKey, children }) => {
       setLoading(false);
     };
     fetch();
-  }, []);
+  }, [filterKey]);
 
   const isAllSelected = useMemo(() => {
     return allOptions.every((e) => e.isSelected);
