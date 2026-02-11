@@ -112,6 +112,10 @@ export const SelectMore: FC<SelectMoreProps> = ({ options }) => {
       allowClear
       size="small"
       styles={{
+        root: {
+          width: '200px',
+          borderColor: 'black',
+        },
         item: {
           background: 'aqua',
         },
@@ -119,7 +123,6 @@ export const SelectMore: FC<SelectMoreProps> = ({ options }) => {
           color: 'black',
         },
       }}
-      style={{ width: '100%' }}
       placeholder={'more +' + options.length}
       value={options.filter((e) => e.isSelected).map((e) => e.value)}
       onSelect={toggle}
