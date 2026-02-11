@@ -58,11 +58,24 @@ export const fetchData = async () => {
   return res;
 };
 
+const withMemo = <T>(fn: () => Promise<T>) => {
+  let memo: Promise<T> | null = null;
+  return () => {
+    if (memo === null) {
+      const promise = fn(); // not need await. memo the Promise not result
+      memo = promise;
+    }
+    return memo;
+  };
+};
+
+export const fetchDataWithMemo = withMemo(fetchData);
+
 export const fetchFilterOptions = async (payload: {
   target: string;
   filters: Record<string, string[]>;
 }) => {
-  const data = await fetchData();
+  const data = await fetchDataWithMemo();
   const { filters, target } = payload;
 
   const filteredData = filteringData(data, filters);
