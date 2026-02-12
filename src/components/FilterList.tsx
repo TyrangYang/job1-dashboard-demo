@@ -1,11 +1,16 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 // import Filter from './Filter';
 import CustomFilter from './Filters/CustomFilter';
 import { useMetaData } from '../context/MetaDataProvider';
+import { createCascadeController } from './Filters/cascadeController';
 
 interface Props {}
 const FilterList: FC<Props> = () => {
-  const { dimensions } = useMetaData();
+  const { dimensions, dependencies } = useMetaData();
+
+  const controller = useMemo(() => {
+    return createCascadeController(dependencies);
+  }, [dependencies]);
 
   return (
     <div
@@ -25,7 +30,11 @@ const FilterList: FC<Props> = () => {
               width: '400px',
             }}
           >
-            <CustomFilter filterLabel={dim.label} filterKey={filterName} />
+            <CustomFilter
+              filterLabel={dim.label}
+              filterKey={filterName}
+              controller={controller}
+            />
           </div>
         );
       })}

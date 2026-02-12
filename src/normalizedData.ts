@@ -56,7 +56,7 @@ export const normalizedData = (
   const groupedData = groupBy(filterData, (each: DataType) =>
     genKeyField(each),
   );
-  console.log({ groupedData });
+  // console.log({ groupedData });
 
   // aggregate/calculate placed cancelled inducted pending number
   const accumulateData = Object.entries(groupedData).map<NormalizedDataType>(

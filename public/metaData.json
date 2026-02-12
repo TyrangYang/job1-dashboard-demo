@@ -13,7 +13,7 @@
       "label": "COUNTRY",
       "key": "COUNTRY",
       "order": 4,
-      "parent": ["SALES_ORG_CD"]
+      "parent": ["GEO", "SALES_ORG_CD"]
     },
     { "label": "COMMIT_CD", "key": "COMMIT_CD", "order": 5 },
     { "label": "PROGRAM_CD", "key": "PROGRAM_CD", "order": 6 }

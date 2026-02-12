@@ -9,6 +9,7 @@ import {
 import type { DimensionType, MetaDataType } from './MetaDataType';
 interface MetadataContextType {
   dimensions: DimensionType[];
+  dependencies: Record<string, string[]>;
 }
 
 const MetadataContext = createContext<MetadataContextType | undefined>(
@@ -16,17 +17,38 @@ const MetadataContext = createContext<MetadataContextType | undefined>(
 );
 const MetaDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const [allDimensions, setAllDimensions] = useState<DimensionType[]>([]);
+  const [dependencies, setDependencies] = useState<Record<string, string[]>>(
+    {},
+  );
   useEffect(() => {
     async function fetchMeta() {
       const response = await fetch(process.env.PUBLIC_URL + '/metaData.json');
-      const metaData: MetaDataType = await response.json();
-      setAllDimensions(metaData.dimensions);
+      const { dimensions }: MetaDataType = await response.json();
+      setAllDimensions(dimensions);
+
+      const dependencies = dimensions.reduce<Record<string, string[]>>(
+        (res, dim) => {
+          if (dim.parent) {
+            for (let parentKey of dim.parent) {
+              res[parentKey] = [...(res[parentKey] ?? []), dim.key];
+            }
+          }
+
+          return res;
+        },
+        {},
+      );
+      console.log(dependencies);
+
+      setDependencies(dependencies);
     }
     fetchMeta();
   }, []);
 
   return (
-    <MetadataContext.Provider value={{ dimensions: allDimensions }}>
+    <MetadataContext.Provider
+      value={{ dimensions: allDimensions, dependencies }}
+    >
       {children}
     </MetadataContext.Provider>
   );

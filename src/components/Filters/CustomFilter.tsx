@@ -3,19 +3,21 @@ import FilterProvider, { useFilterContext } from './FilterProvider';
 
 import styles from './filter.module.css';
 import Select from 'antd/es/select';
+import type { CascadeFilterController } from './cascadeController';
 
 const maxOnScreen = 5;
 
 interface Props {
   filterLabel: string;
   filterKey: string;
+  controller: CascadeFilterController;
 }
 
-const CustomFilter: FC<Props> = ({ filterLabel, filterKey }) => {
+const CustomFilter: FC<Props> = ({ filterLabel, filterKey, controller }) => {
   // console.log(filterKey, options);
 
   return (
-    <FilterProvider filterKey={filterKey}>
+    <FilterProvider filterKey={filterKey} controller={controller}>
       <label className={styles.filterLabel}>{filterLabel}</label>
       <FilterBoard />
     </FilterProvider>

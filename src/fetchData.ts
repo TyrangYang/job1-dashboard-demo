@@ -53,7 +53,7 @@ export const fetchData = async () => {
     }, {} as DataType);
   });
 
-  console.log({ fetched: res });
+  // console.log({ fetched: res });
 
   return res;
 };

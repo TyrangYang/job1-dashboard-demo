@@ -1,14 +1,18 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react';
 import type { FC, PropsWithChildren, ActionDispatch } from 'react';
 import { useDataContext } from '../../context/DataProvider';
 import { fetchFilterOptions } from '../../fetchData';
+import type { CascadeFilterController } from './cascadeController';
+import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 export interface OptionsBasic {
   label: string;
@@ -20,6 +24,7 @@ interface ContextType {
   filterKey: string;
   selectedValue: string[];
   isAllSelected: boolean;
+  // fetchOptions: (extraFilters?: {}, selected?: string[]) => Promise<void>;
   options: (OptionsBasic & { isSelected: boolean })[];
   dispatchOptionSelectedStatus: ActionDispatch<[ActionType]>;
 }
@@ -27,15 +32,16 @@ const FilterContext = createContext<ContextType | undefined>(undefined);
 
 interface Props extends PropsWithChildren {
   filterKey: string;
+  controller: CascadeFilterController;
 }
 
 type ActionType =
   | { type: 'toggle'; optionKey: string }
-  | { type: 'init'; options: OptionsBasic[] }
+  | { type: 'init'; options: OptionsBasic[]; selected?: string[] }
   | { type: 'cleanAll' }
   | { type: 'selectAll' };
 
-const FilterProvider: FC<Props> = ({ filterKey, children }) => {
+const FilterProvider: FC<Props> = ({ filterKey, controller, children }) => {
   // this design is just for mimic mobx. Not necessary
 
   const { setSelectedFilterOptions } = useDataContext();
@@ -61,30 +67,56 @@ const FilterProvider: FC<Props> = ({ filterKey, children }) => {
           isSelected: false,
         }));
       case 'init':
-        console.log(action.options);
-        return action.options.map((e) => ({ ...e, isSelected: false }));
+        return action.options.map((e) => {
+          if (action.selected?.includes(e.value)) {
+            return { ...e, isSelected: true };
+          }
+          return { ...e, isSelected: false };
+        });
 
       default:
         return prevOptions;
     }
   }, []);
 
-  useEffect(() => {
-    const fetch = async () => {
+  const currentRequestRef = useRef<symbol | null>(null);
+  const fetchOptions = useCallback(
+    async (extraFilters = {}, selected: string[] = []) => {
+      const requestId = Symbol();
+      currentRequestRef.current = requestId;
+
       setLoading(true);
+
       const options = await fetchFilterOptions({
         target: filterKey,
-        filters: {},
+        filters: extraFilters,
       });
+
+      if (currentRequestRef.current !== requestId) return; // prevent competing
 
       dispatchOptionSelectedStatus({
         type: 'init',
         options: options.map((e) => ({ label: e, value: e })),
+        selected,
       });
+
       setLoading(false);
+    },
+    [filterKey],
+  );
+
+  useEffect(() => {
+    controller.register(filterKey, {
+      fetchOptions,
+      reset: () => dispatchOptionSelectedStatus({ type: 'cleanAll' }),
+    });
+
+    fetchOptions(); // init fetch
+
+    return () => {
+      controller.unregister(filterKey);
     };
-    fetch();
-  }, [filterKey]);
+  }, [controller, fetchOptions, filterKey]);
 
   const isAllSelected = useMemo(() => {
     return allOptions.every((e) => e.isSelected);
@@ -95,6 +127,11 @@ const FilterProvider: FC<Props> = ({ filterKey, children }) => {
     return allOptions.filter((option) => option.isSelected).map((e) => e.value);
   }, [allOptions]);
 
+  useUpdateEffect(() => {
+    controller.triggerFetch(filterKey, { [filterKey]: selectedValue });
+  }, [selectedValue, controller, filterKey]);
+
+  // for Table only
   useEffect(() => {
     setSelectedFilterOptions({ field: filterKey, value: selectedValue });
   }, [selectedValue, filterKey, setSelectedFilterOptions]);
@@ -107,7 +144,7 @@ const FilterProvider: FC<Props> = ({ filterKey, children }) => {
         selectedValue,
         isAllSelected,
         options: allOptions,
-        dispatchOptionSelectedStatus: dispatchOptionSelectedStatus,
+        dispatchOptionSelectedStatus,
       }}
     >
       {children}
