@@ -1,0 +1,21 @@
+{
+  "dimensions": [
+    { "label": "LOB1", "key": "LOB", "order": 0, "parent": [] },
+    { "label": "SUB_LOB2", "key": "SUB_LOB", "order": 1, "parent": [] },
+    { "label": "GEO3", "key": "GEO", "order": 2 },
+    {
+      "label": "SALES_ORG_CD",
+      "key": "SALES_ORG_CD",
+      "order": 3,
+      "parent": ["GEO"]
+    },
+    {
+      "label": "COUNTRY",
+      "key": "COUNTRY",
+      "order": 4,
+      "parent": ["GEO", "SALES_ORG_CD"]
+    },
+    { "label": "COMMIT_CD", "key": "COMMIT_CD", "order": 5 },
+    { "label": "PROGRAM_CD", "key": "PROGRAM_CD", "order": 6 }
+  ]
+}
