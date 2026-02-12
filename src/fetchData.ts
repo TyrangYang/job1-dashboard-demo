@@ -41,7 +41,7 @@ export type DataType = Pick<RawDataType, NeededFieldsKeys>;
 
 export const fetchData = async () => {
   const response = await fetch(process.env.PUBLIC_URL + '/result-16.csv');
-  console.log(process.env.PUBLIC_URL);
+  // console.log(process.env.PUBLIC_URL);
   const csvText = await response.text();
   const parsedObj = papa.parse<RawDataType>(csvText, {
     header: true,

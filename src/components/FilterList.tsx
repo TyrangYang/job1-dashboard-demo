@@ -16,7 +16,8 @@ const FilterList: FC<Props> = () => {
         // flexWrap: 'nowrap',
       }}
     >
-      {dimensions.map((filterName) => {
+      {dimensions.map((dim) => {
+        const filterName = dim.key;
         return (
           <div
             key={`filter-${filterName}`}
@@ -24,7 +25,7 @@ const FilterList: FC<Props> = () => {
               width: '400px',
             }}
           >
-            <CustomFilter filterKey={filterName} />
+            <CustomFilter filterLabel={dim.label} filterKey={filterName} />
           </div>
         );
       })}

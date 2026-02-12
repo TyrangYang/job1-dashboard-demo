@@ -23,7 +23,6 @@ type DataContextType = {
   data: NormalizedDataType[];
   oriData: DataType[];
   allAvailableDimension: string[];
-  filterOptions: Record<string, string[]>;
   selectedFilterOptions: Record<string, string[]>;
   setSelectedFilterOptions: React.ActionDispatch<
     [SetSelectedFilterOptionsActionType]
@@ -34,10 +33,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const DataProvider: FC<Props> = ({ children }) => {
   const [data, setData] = useState<DataType[]>([]);
-  // const [allDimension, setAllDimension] = useState<string[]>([]);
-  const [filterOptions, setFilterOptions] = useState<{
-    [k: string]: string[];
-  }>({});
+
   const [selectedFilterOptions, setSelectedFilterOptions] = useReducer<
     Record<string, string[]>,
     [SetSelectedFilterOptionsActionType]
@@ -61,11 +57,9 @@ const DataProvider: FC<Props> = ({ children }) => {
   useEffect(() => {
     const fetch = async () => {
       const fetchedData = await fetchData();
-      const { fields: allPossibleFilterOptions } =
-        normalizedOption(fetchedData);
+
       // console.log(allPossibleFilterOptions);
       // setAllDimension(dimensions);
-      setFilterOptions(allPossibleFilterOptions);
       setData(fetchedData);
     };
     fetch();
@@ -75,7 +69,6 @@ const DataProvider: FC<Props> = ({ children }) => {
       value={{
         data: normalizedD,
         oriData: data,
-        filterOptions,
         allAvailableDimension,
         selectedFilterOptions,
         setSelectedFilterOptions,

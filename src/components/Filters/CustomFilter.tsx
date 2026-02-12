@@ -7,15 +7,16 @@ import Select from 'antd/es/select';
 const maxOnScreen = 5;
 
 interface Props {
+  filterLabel: string;
   filterKey: string;
 }
 
-const CustomFilter: FC<Props> = ({ filterKey }) => {
+const CustomFilter: FC<Props> = ({ filterLabel, filterKey }) => {
   // console.log(filterKey, options);
 
   return (
     <FilterProvider filterKey={filterKey}>
-      <label className={styles.filterLabel}>{filterKey}</label>
+      <label className={styles.filterLabel}>{filterLabel}</label>
       <FilterBoard />
     </FilterProvider>
   );
