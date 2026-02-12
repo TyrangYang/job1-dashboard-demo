@@ -11,8 +11,8 @@ import {
 import type { FC, PropsWithChildren, ActionDispatch } from 'react';
 import { useDataContext } from '../../context/DataProvider';
 import { fetchFilterOptions } from '../../fetchData';
-import type { CascadeFilterController } from './cascadeController';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
+import { useCascadeFilterController } from './CascadeControllerProvider';
 
 export interface OptionsBasic {
   label: string;
@@ -32,7 +32,6 @@ const FilterContext = createContext<ContextType | undefined>(undefined);
 
 interface Props extends PropsWithChildren {
   filterKey: string;
-  controller: CascadeFilterController;
 }
 
 type ActionType =
@@ -41,10 +40,12 @@ type ActionType =
   | { type: 'cleanAll' }
   | { type: 'selectAll' };
 
-const FilterProvider: FC<Props> = ({ filterKey, controller, children }) => {
+const FilterProvider: FC<Props> = ({ filterKey, children }) => {
   // this design is just for mimic mobx. Not necessary
 
   const { setSelectedFilterOptions } = useDataContext();
+  const controller = useCascadeFilterController();
+
   const [loading, setLoading] = useState(true);
 
   // reduce mimic @action. status(allOptions) mimic @observable
@@ -127,9 +128,9 @@ const FilterProvider: FC<Props> = ({ filterKey, controller, children }) => {
     return allOptions.filter((option) => option.isSelected).map((e) => e.value);
   }, [allOptions]);
 
-  useUpdateEffect(() => {
-    controller.triggerFetch(filterKey, { [filterKey]: selectedValue });
-  }, [selectedValue, controller, filterKey]);
+  // useUpdateEffect(() => {
+  //   controller.triggerFetch(filterKey, { [filterKey]: selectedValue });
+  // }, [selectedValue, controller, filterKey]);
 
   // for Table only
   useEffect(() => {

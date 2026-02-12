@@ -38,7 +38,6 @@ const MetaDataProvider: FC<PropsWithChildren> = ({ children }) => {
         },
         {},
       );
-      console.log(dependencies);
 
       setDependencies(dependencies);
     }
