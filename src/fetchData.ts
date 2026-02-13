@@ -65,6 +65,7 @@ const withMemo = <T>(fn: () => Promise<T>) => {
       const promise = fn(); // not need await. memo the Promise not result
       memo = promise;
     }
+    console.log('fetch cached');
     return memo;
   };
 };

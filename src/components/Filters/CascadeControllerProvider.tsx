@@ -2,8 +2,10 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  RefObject,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
 
 interface APIsType {
@@ -17,7 +19,8 @@ interface APIsType {
 export interface CascadeFilterController {
   register(key: string, apis: APIsType): void;
   unregister(key: string): void;
-  triggerFetch(key: string, payload: Record<string, string[]>): void;
+  triggerFetch(key: string, extraPayload?: Record<string, string[]>): void;
+  selectedValueMapRef: RefObject<Map<string, string[]>>;
 }
 
 const ControllerContext = createContext<CascadeFilterController | undefined>(
@@ -25,36 +28,56 @@ const ControllerContext = createContext<CascadeFilterController | undefined>(
 );
 
 interface Props extends PropsWithChildren {
-  allDependencies: Record<string, string[]>;
+  parentToChildren: Record<string, string[]>;
+  childToParent: Record<string, string[]>;
 }
-const registry = new Map<string, APIsType>(); // filterKey => fetchOptions function
-const ControllerProvider: FC<Props> = ({ allDependencies, children }) => {
+const ControllerProvider: FC<Props> = ({
+  parentToChildren,
+  childToParent,
+  children,
+}) => {
+  const registryRef = useRef(new Map<string, APIsType>()); // filterKey => fetchOptions function
+  const selectedValueMapRef = useRef(new Map<string, string[]>()); // filterKey => selected value
   const controller = useMemo(() => {
     return {
+      selectedValueMapRef,
       register(key: string, apis: APIsType) {
-        registry.set(key, apis);
+        registryRef.current.set(key, apis);
       },
 
       unregister(key: string) {
-        registry.delete(key);
+        registryRef.current.delete(key);
       },
 
-      triggerFetch(key: string, payload: Record<string, string[]>) {
-        const downstream = allDependencies[key] || [];
-        // console.log(key, payload, allDependencies);
+      triggerFetch(key: string, extraPayload: Record<string, string[]>) {
+        const downstream = parentToChildren[key] || [];
+        // console.log(key, parentToChildren, childToParent);
         // console.log({ downstream });
         downstream.forEach((depKey) => {
-          const filter = registry.get(depKey);
+          const filter = registryRef.current.get(depKey);
           if (!filter) return;
-
           // console.log(filter);
-
+          const parentKeys = childToParent[depKey] ?? [];
+          // console.log(depKey, parentKeys);
+          const payload = parentKeys.reduce<Record<string, string[]>>(
+            (res, curKey) => {
+              if (!selectedValueMapRef.current.has(curKey)) return res;
+              else {
+                return {
+                  ...res,
+                  [curKey]: selectedValueMapRef.current.get(curKey) as string[],
+                };
+              }
+            },
+            {},
+          );
+          // console.log(payload);
           filter.reset();
           filter.fetchOptions(payload);
         });
       },
     };
-  }, [allDependencies]);
+  }, [parentToChildren, childToParent]);
   return (
     <ControllerContext.Provider value={controller}>
       {children}

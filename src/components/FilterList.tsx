@@ -6,9 +6,12 @@ import ControllerProvider from './Filters/CascadeControllerProvider';
 
 interface Props {}
 const FilterList: FC<Props> = () => {
-  const { dimensions, dependencies } = useMetaData();
+  const { dimensions, parentToChildren, childToParent } = useMetaData();
   return (
-    <ControllerProvider allDependencies={dependencies}>
+    <ControllerProvider
+      parentToChildren={parentToChildren}
+      childToParent={childToParent}
+    >
       <div
         style={{
           display: 'flex',

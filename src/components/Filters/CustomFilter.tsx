@@ -3,10 +3,6 @@ import FilterProvider, { useFilterContext } from './FilterProvider';
 
 import styles from './filter.module.css';
 import Select from 'antd/es/select';
-import {
-  useCascadeFilterController,
-  type CascadeFilterController,
-} from './CascadeControllerProvider';
 
 const maxOnScreen = 5;
 
@@ -64,12 +60,7 @@ export const FilterItemButton: FC<ItemsProps> = ({
   value,
   selected,
 }) => {
-  const {
-    dispatchOptionSelectedStatus,
-    filterKey,
-    selectedValue: prevSelectedValue,
-  } = useFilterContext();
-  const { triggerFetch } = useCascadeFilterController();
+  const { dispatchOptionSelectedStatus } = useFilterContext();
 
   const handleOnClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -79,12 +70,6 @@ export const FilterItemButton: FC<ItemsProps> = ({
     // eslint-disable-next-line react-hooks/rules-of-hooks
 
     dispatchOptionSelectedStatus({ type: 'toggle', optionKey: value });
-    const currentSelectedValue = selected
-      ? prevSelectedValue.filter((e) => e !== value)
-      : [...prevSelectedValue, value];
-    triggerFetch(filterKey, {
-      [filterKey]: currentSelectedValue,
-    });
   };
   return (
     <button

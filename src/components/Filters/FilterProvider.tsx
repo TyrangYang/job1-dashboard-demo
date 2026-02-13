@@ -11,7 +11,6 @@ import {
 import type { FC, PropsWithChildren, ActionDispatch } from 'react';
 import { useDataContext } from '../../context/DataProvider';
 import { fetchFilterOptions } from '../../fetchData';
-import useUpdateEffect from '../../hooks/useUpdateEffect';
 import { useCascadeFilterController } from './CascadeControllerProvider';
 
 export interface OptionsBasic {
@@ -125,12 +124,29 @@ const FilterProvider: FC<Props> = ({ filterKey, children }) => {
 
   // mimic @computed
   const selectedValue = useMemo(() => {
-    return allOptions.filter((option) => option.isSelected).map((e) => e.value);
-  }, [allOptions]);
+    const selected = allOptions
+      .filter((option) => option.isSelected)
+      .map((e) => e.value);
 
-  // useUpdateEffect(() => {
-  //   controller.triggerFetch(filterKey, { [filterKey]: selectedValue });
-  // }, [selectedValue, controller, filterKey]);
+    // hack: update selected value to map immediately
+    controller.selectedValueMapRef.current.set(filterKey, selected);
+    return selected;
+  }, [allOptions, filterKey, controller.selectedValueMapRef]);
+
+  const prevSelectedValue = useRef<string[]>([]);
+  useEffect(() => {
+    const isEqualToPrev = () => {
+      return (
+        prevSelectedValue.current.length === selectedValue.length &&
+        selectedValue.every((val) => prevSelectedValue.current.includes(val))
+      );
+    };
+    if (!isEqualToPrev()) {
+      // deep compare is better then trigger refetch
+      controller.triggerFetch(filterKey);
+      prevSelectedValue.current = selectedValue;
+    }
+  }, [selectedValue, controller, filterKey]);
 
   // for Table only
   useEffect(() => {

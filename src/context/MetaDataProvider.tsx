@@ -9,7 +9,8 @@ import {
 import type { DimensionType, MetaDataType } from './MetaDataType';
 interface MetadataContextType {
   dimensions: DimensionType[];
-  dependencies: Record<string, string[]>;
+  parentToChildren: Record<string, string[]>;
+  childToParent: Record<string, string[]>;
 }
 
 const MetadataContext = createContext<MetadataContextType | undefined>(
@@ -17,7 +18,10 @@ const MetadataContext = createContext<MetadataContextType | undefined>(
 );
 const MetaDataProvider: FC<PropsWithChildren> = ({ children }) => {
   const [allDimensions, setAllDimensions] = useState<DimensionType[]>([]);
-  const [dependencies, setDependencies] = useState<Record<string, string[]>>(
+  const [parentToChildren, setParentToChildren] = useState<
+    Record<string, string[]>
+  >({});
+  const [childToParent, setChildToParent] = useState<Record<string, string[]>>(
     {},
   );
   useEffect(() => {
@@ -26,7 +30,7 @@ const MetaDataProvider: FC<PropsWithChildren> = ({ children }) => {
       const { dimensions }: MetaDataType = await response.json();
       setAllDimensions(dimensions);
 
-      const dependencies = dimensions.reduce<Record<string, string[]>>(
+      const parentToChildren = dimensions.reduce<Record<string, string[]>>(
         (res, dim) => {
           if (dim.parent) {
             for (let parentKey of dim.parent) {
@@ -37,16 +41,26 @@ const MetaDataProvider: FC<PropsWithChildren> = ({ children }) => {
           return res;
         },
         {},
-      );
+      ); // parent => [children]
 
-      setDependencies(dependencies);
+      const childToParentTmp: Record<string, string[]> = {}; // child => [parent]
+      Object.entries(parentToChildren).forEach(([parent, children]) => {
+        for (let child of children) {
+          childToParentTmp[child] = [
+            ...(childToParentTmp[child] ?? []),
+            parent,
+          ];
+        }
+      });
+      setChildToParent(childToParentTmp);
+      setParentToChildren(parentToChildren);
     }
     fetchMeta();
   }, []);
 
   return (
     <MetadataContext.Provider
-      value={{ dimensions: allDimensions, dependencies }}
+      value={{ dimensions: allDimensions, parentToChildren, childToParent }}
     >
       {children}
     </MetadataContext.Provider>
